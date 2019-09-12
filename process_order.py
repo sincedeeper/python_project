@@ -1,5 +1,5 @@
 import pandas as pd
-
+import matplotlib.pyplot as plt
 # 当前Q或者指定Q的时间段
 from pandas import Grouper
 
@@ -166,13 +166,16 @@ def all_Month_By_Cost_booking(mydf):
 # 结果输出
 # 输入df1,调用三个主函数，输出的sheet_name1--5,用了全局变量
 # 指定时间内的订单数统计
-# result_specify_Month_By_OrderCount=specify_Month_By_OrderCount(df1,StartTime,EndTime)
+#result_specify_Month_By_OrderCount=specify_Month_By_OrderCount(df1,StartTime,EndTime)
 # 指定订单时间内的Cost统计
 result_specify_Month_By_Cost = specify_Month_By_Cost(df1, StartTime, EndTime)
 (resultl_ALL_Month_By_Cost_ByQ, result_ALL_Month_By_Cost_BySPL,
  result_ALL_Month_By_Cost_Total) = all_Month_By_Cost(df1)
 (result_ALL_Month_By_Cost_ByQ_Booking, result_ALL_Month_By_Cost_BySPL_Booking,
  result_ALL_Month_By_Cost_Total_Booking) = all_Month_By_Cost_booking(df1)
+#柱状图，not yet work
+#result_specify_Month_By_OrderCount.plot(kind='bar')
+#plt.show()
 # 输出到result.xlsx 文件，如果改文件存在，则覆盖
 # booking开头的sheet是以入账时间进行计算
 with pd.ExcelWriter('result.xlsx') as writer:
