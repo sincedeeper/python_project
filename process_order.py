@@ -32,7 +32,7 @@ booking_sheet_name5 = 'Booking Total ByQ'
 # 新的订单表一定要手动删除列名上面的哪一行数据
 
 
-excelFile = r'QTD订单交付报表-入账明细20190904.xlsx'
+excelFile = r'QTD订单交付报表-入账明细20190911.xlsx'
 costFile = r'cost.xlsx'
 df = pd.DataFrame(pd.read_excel(excelFile))
 df_Cost = pd.DataFrame(pd.read_excel(costFile, usecols=[1, 2]))
