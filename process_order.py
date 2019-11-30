@@ -89,7 +89,10 @@ def specify_Month_By_OrderCount(mydf, myStartTime, myEndTime):
 
 #  指定订单时间内，可供分摊的Cost统计
 def specify_Month_By_Cost(mydf, myStartTime, myEndTime):
-    mydf.loc[:, 'Input Date'] = pd.to_datetime(mydf.loc[:, 'Input Date'])
+    #以下两种方法是等效的
+    # mydf.loc[:, 'Input Date'] = pd.to_datetime(mydf.loc[:, 'Input Date'])
+    mydf['Input Date'] = pd.to_datetime(mydf['Input Date'])
+
     mydf = mydf.set_index('Input Date')
     print(
         '\n---------------------------------------开始按照指定日期，以Cost'
