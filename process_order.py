@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 # 当前Q或者指定Q的时间段
 from pandas import Grouper
 
-# 以下开始全局变量的定义
+# 以下开始全局变量的定义，用于定义sheet_name和按照时间段截取数据
 StartTime = '2019-04'
 EndTime = '2019-06'
 
@@ -29,7 +29,7 @@ booking_sheet_name5 = 'Booking Total ByQ'
 
 # 加r以防止转义字符
 # df为Raw数据，df1为清洗过的数据
-# 新的订单表一定要手动删除列名上面的哪一行数据
+# 新的订单表一定要手动删除列名上面的那一行数据，删除表头
 
 
 excelFile = r'QTD订单交付报表-入账明细20190911.xlsx'
@@ -59,7 +59,7 @@ df1['Project Name'].replace('数据备份', 'DPA', inplace=True)
 df1['Project Name'].replace('虚拟化support', 'Vmware', inplace=True)
 
 # 剔除Y4285-nutanix远程技术支持
-# df1=df1.drop(df1[df1['Project Name'] == 'ThinkAgile'].index)
+df1=df1.drop(df1[df1['Project Name'] == 'ThinkAgile'].index)
 
 # 获取所有的SPL 类别
 # SPLList = df1['Project Name'].drop_duplicates().T.values.tolist()
@@ -68,7 +68,7 @@ df1['Project Name'].replace('虚拟化support', 'Vmware', inplace=True)
 # 此时，df1为初步清洗过的数据，修改了SPL类别，需要根据情况判断是否需要剔除95Y4285-nutanix远程技术支持，line55
 
 # 以下开始各个功能函数的定义
-# 开始计算指定（StartTime和ENDTime之间的数据）By 产品线计算订单数
+# 开始计算指定（StartTime和ENDTime之间的数据）By 产品线计算订单数，不考虑每个订单PN的数量
 def specify_Month_By_OrderCount(mydf, myStartTime, myEndTime):
     print(
         '\n---------------------------------------开始按照指定日期，以订单数量的方式计算---'
@@ -77,6 +77,7 @@ def specify_Month_By_OrderCount(mydf, myStartTime, myEndTime):
     mydf = mydf.drop(mydf[mydf['P/N'] == 'CNNU002'].index)
     # 设置订单时间段为索引,为以订单时间为条件筛选数据做准备
     mydf['Input Date'] = pd.to_datetime(mydf['Input Date'])
+    # 截取数据前，需要先设置索引，然后根据索引截取数据
     mydf = mydf.set_index('Input Date')
     # 获取StartTime和EndTime之间的数据；投影SPL（Group by project Name）;计算结果为BySPL 的订单数
     mydf = mydf[StartTime:EndTime].groupby(['Project Name'])[
@@ -86,7 +87,7 @@ def specify_Month_By_OrderCount(mydf, myStartTime, myEndTime):
     return mydf
 
 
-#  指定订单时间内的Cost统计
+#  指定订单时间内，可供分摊的Cost统计
 def specify_Month_By_Cost(mydf, myStartTime, myEndTime):
     mydf.loc[:, 'Input Date'] = pd.to_datetime(mydf.loc[:, 'Input Date'])
     mydf = mydf.set_index('Input Date')
@@ -103,8 +104,9 @@ def specify_Month_By_Cost(mydf, myStartTime, myEndTime):
     return mydf
 
 
-# 按照季度，计算从2017年1月开始，到目前为止，以Cost方式计算
+# 按照季度，计算从2017年1月开始，到目前为止，可供分摊的Cost统计
 # 按照季度计算所有数据，By cost方式
+# 时间计算方式为订单时间
 def all_Month_By_Cost(mydf):
     print(
         '\n---------------------------------------开始从2017年开始，By 季度 '
@@ -134,8 +136,9 @@ def all_Month_By_Cost(mydf):
             )
 
 
-# 以解锁时间统计，按照季度，计算从2017年1月开始，到目前为止，以Cost方式计算，
+# 以解锁时间统计，按照季度，计算从2017年1月开始，到目前为止，可供分摊的Cost统计
 # 按照季度计算所有数据，By cost方式
+# 时间计算方式为订单解锁时间
 def all_Month_By_Cost_booking(mydf):
     print(
         '\n---------------------------------------以Booking时间，开始从2017年开始，By 季度 '
@@ -154,7 +157,7 @@ def all_Month_By_Cost_booking(mydf):
     df_ByBookingTime_All_From2007_BySPL = \
         mydf.groupby(['Project Name', Grouper(key='财务入账时间', freq='BQ')])[
             'Total Cost'].sum().rename('合计Cost').reset_index()
-
+    # 每个季度Total 可以分摊的数量
     df_ByBookingTime_All_From2007_Total = mydf.groupby([Grouper(key='财务入账时间', freq='BQ')])[
         'Total Cost'].sum().rename('合计Cost').reset_index()
 
